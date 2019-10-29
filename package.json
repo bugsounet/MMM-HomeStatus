@@ -1,7 +1,7 @@
 {
   "name": "MMM-HomeStatus",
-  "version": "1.0.0",
-  "description": "Display Home IOT.",
+  "version": "1.0.1",
+  "description": "Display Home IOT Status.",
   "main": "mmm-HomeStatus.js",
   "keywords": [
     "magic mirror",
@@ -15,13 +15,13 @@
   "author": "bugs",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bugs/MMM-HomeStatus/issues"
+    "url": "https://github.com/bugsounet/MMM-HomeStatus/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bugs/MMM-HomeStatus"
+    "url": "https://github.com/bugsounet/MMM-HomeStatus"
   },
-  "homepage": "https://github.com/bugs/MMM-HomeStatus",
+  "homepage": "https://github.com/bugsounet/MMM-HomeStatus",
   "dependencies": {
     "magic-home": "^2.2.1",
     "xbox-smartglass-core-node": "^0.6.1",
