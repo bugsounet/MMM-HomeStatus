@@ -5,6 +5,7 @@ Module.register("MMM-HomeStatus", {
 		debug: false,
 		MagicHome: {
 			active: false,
+			display: "Light",
 			ip: ""
 		},
 		Freebox: {
@@ -19,7 +20,7 @@ Module.register("MMM-HomeStatus", {
 				https_port: 0
 			}
 		},
-		TV : {
+		TV: {
 			active: false,
 			ip: "",
 			command: ""
@@ -30,6 +31,7 @@ Module.register("MMM-HomeStatus", {
 		},
 		Xbox: {
 			active: false,
+			display: "Xbox",
 			ip: ""
 		},
 		Internet: {
@@ -37,7 +39,35 @@ Module.register("MMM-HomeStatus", {
 		}
 	},
 
+  	configAssignment : function (result) {
+    		var stack = Array.prototype.slice.call(arguments, 1)
+    		var item
+   		var key
+    		while (stack.length) {
+      			item = stack.shift()
+      			for (key in item) {
+        			if (item.hasOwnProperty(key)) {
+          				if (
+            					typeof result[key] === "object"
+            					&& result[key]
+            					&& Object.prototype.toString.call(result[key]) !== "[object Array]"
+          				) {
+            					if (typeof item[key] === "object" && item[key] !== null) {
+              						result[key] = this.configAssignment({}, result[key], item[key])
+            					} else {
+              						result[key] = item[key]
+            					}
+          				} else {
+            					result[key] = item[key]
+          				}
+        			}
+      			}
+    		}
+    		return result
+  	},
+
 	start: function () {
+		this.config = this.configAssignment({}, this.defaults, this.config);
 		this.Init = false;
 		this.HomeStatus = {};
 	},
@@ -59,29 +89,29 @@ Module.register("MMM-HomeStatus", {
 
         resetCountdown: function () {
         	var self = this;
-        	clearInterval(self.interval);
-		self.counter = this.config.delay;
-        	self.updateDom();
+			clearInterval(self.interval);
+			self.counter = this.config.delay;
+			self.updateDom();
 
         	self.interval = setInterval(function () {
             		self.counter -= 1000;
             		if (self.counter <= 0) {
 				clearInterval(self.interval);
-				self.sendSocketNotification("SCAN", self.config);
+				self.sendSocketNotification("SCAN", false);
             		}
 	    		self.updateDom();
         	}, 1000);
         },
 
 	getDom: function () {
-        	var self = this;
+		var self = this;
 		var data = self.HomeStatus;
 
 		var wrapper = document.createElement("div")
 
 		if (!this.Init) {
 			wrapper.className = "HS_LOADING"
-			wrapper.innerHTML = "Chargement des données ..."
+			wrapper.innerHTML = this.translate("LOADING");
 			return wrapper
 		}
 		wrapper.innerHTML = ""
@@ -94,6 +124,7 @@ Module.register("MMM-HomeStatus", {
 		if (Object.keys(data).length > 0) {
 			for (let [item, value] of Object.entries(data)) {
 				var activate = value.active
+				var display = value.display
 				var status = value.status
 				var color = value.color
 				var switched
@@ -104,7 +135,7 @@ Module.register("MMM-HomeStatus", {
 					// item Cell
 					var ItemCell = document.createElement("td")
 					ItemCell.className = "HS_ITEM"
-					ItemCell.innerHTML = item.replace(/_/gi, ' ')
+					ItemCell.innerHTML = display ? display : item // item.replace(/_/gi, ' ')
 					StatusRow.appendChild(ItemCell)
 
 					// Infos Cell

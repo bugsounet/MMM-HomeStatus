@@ -1,6 +1,6 @@
 {
   "name": "MMM-HomeStatus",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Display Home IOT Status.",
   "main": "MMM-HomeStatus.js",
   "keywords": [
