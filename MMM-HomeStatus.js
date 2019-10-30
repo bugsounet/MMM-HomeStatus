@@ -117,10 +117,10 @@ Module.register("MMM-HomeStatus", {
 						InfoCell.style.width = "100px"
 					}
 					if (status && value.ping && value.ping != null) InfoCell.innerHTML = value.ping + "ms"
-					if (status && value.rate && value.rate !=0)) InfoCell.innerHTML = value.rate
+					if (status && value.rate && value.rate !=0) InfoCell.innerHTML = value.rate
 					if (status && value.name && value.name != null) InfoCell.innerHTML = value.name
-					if (status && value.app && value.app != null)) InfoCell.innerHTML = value.app
-					if (status && value.source && value.source != null)) InfoCell.innerHTML = value.source
+					if (status && value.app && value.app != null) InfoCell.innerHTML = value.app
+					if (status && value.source && value.source != null) InfoCell.innerHTML = value.source
 
 					StatusRow.appendChild(InfoCell)
 
