@@ -239,7 +239,7 @@ module.exports = NodeHelper.create({
 	if (self.config.MagicHome.active) this.magic_query(self.config.MagicHome.ip);
 	if (self.config.TV.active) {
 		this.tv_Status(self.config.TV.ip);
-		if (self.PC_status) this.tv_Source(self.config.TV.command);
+		if (self.TV_status) this.tv_Source(self.config.TV.command);
 	}
 	if (self.config.PC.active) {
 	    	this.pc_Status(self.config.PC.ip);
