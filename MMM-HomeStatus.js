@@ -5,8 +5,8 @@ Module.register("MMM-HomeStatus", {
 		debug: false,
 		MagicHome: {
 			active: false,
-			display: "Light",
-			ip: ""
+			display: [],
+			ip: []
 		},
 		Freebox: {
 			active: false,
@@ -22,20 +22,24 @@ Module.register("MMM-HomeStatus", {
 		},
 		TV: {
 			active: false,
-			ip: "",
-			command: ""
+			display: [],
+			ip: [],
+			command: []
 		},
 		PC: {
 			active: false,
-			ip: ""
+			display: [],
+			ip: []
 		},
 		Xbox: {
 			active: false,
-			display: "Xbox",
-			ip: ""
+			display: [],
+			ip: []
 		},
 		Internet: {
-			active: true
+			active: true,
+			scan: "google.fr",
+			display: [ "Internet" ]
 		}
 	},
 
@@ -122,37 +126,44 @@ Module.register("MMM-HomeStatus", {
 
 
 		if (Object.keys(data).length > 0) {
-			for (let [item, value] of Object.entries(data)) {
-				var activate = value.active
-				var display = value.display
-				var status = value.status
-				var color = value.color
-				var switched
+			for (let [item, value] of Object.entries(data)) { // search in all Modules entry
+			   var activate = value.active
+			   var display = value.display
+			   var status = value.status
+			   var color = value.color
+			   var ping = value.ping
+			   var rate = value.rate
+			   var name = value.name
+			   var app = value.app
+			   var source = value.source
+			   var switched
 
-				var StatusRow = document.createElement("tr")
+			   for (var i in display) { // search in module (multi display)
+			   	var StatusRow = document.createElement("tr")
 
 				if (activate) { // --> Display only if module actived
 					// item Cell
 					var ItemCell = document.createElement("td")
 					ItemCell.className = "HS_ITEM"
-					ItemCell.innerHTML = display ? display : item.replace(/_/gi, ' ')
+					ItemCell.innerHTML = display[i] // ? display[i] : item.replace(/_/gi, ' ')
 					StatusRow.appendChild(ItemCell)
 
 					// Infos Cell
 					var InfoCell = document.createElement("td")
 					InfoCell.className = "HS_INFO"
-					if (value.color && status) {
-						var rgb = "rgb(" + color.red + "," + color.green + "," + color.blue + ")"
-						InfoCell.style.backgroundColor = rgb
-						InfoCell.style.borderRadius = "25px"
-						InfoCell.style.width = "100px"
+					if (status) { // device is on ?
+						if (color && color[i]) { // MagicHome Color
+							var rgb = "rgb(" + color[i].red + "," + color[i].green + "," + color[i].blue + ")"
+							InfoCell.style.backgroundColor = rgb
+							InfoCell.style.borderRadius = "25px"
+							InfoCell.style.width = "100px"
+						}
+						if (ping && ping != null) InfoCell.innerHTML = ping + " ms" // ping internet
+						if (rate && rate !=0) InfoCell.innerHTML = rate // rate Freebox
+						if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i] // name PC
+						if (app && app[i] && app[i] != null) InfoCell.innerHTML = app[i] // name of Xbox app
+						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
 					}
-					if (status && value.ping && value.ping != null) InfoCell.innerHTML = value.ping + "ms"
-					if (status && value.rate && value.rate !=0) InfoCell.innerHTML = value.rate
-					if (status && value.name && value.name != null) InfoCell.innerHTML = value.name
-					if (status && value.app && value.app != null) InfoCell.innerHTML = value.app
-					if (status && value.source && value.source != null) InfoCell.innerHTML = value.source
-
 					StatusRow.appendChild(InfoCell)
 
 					// Need Space ?
@@ -169,7 +180,7 @@ Module.register("MMM-HomeStatus", {
 					button.id = "switched"
 					button.type = "checkbox"
 					button.className = "switch-toggle switch-round";
-					button.checked = status
+					button.checked = status[i]
 					button.disabled = true
 
 					var label = document.createElement('label')
@@ -185,6 +196,7 @@ Module.register("MMM-HomeStatus", {
 
 					wrapper.appendChild(dataTable)
 				}
+			   }
 			}
 			return wrapper
 		}
