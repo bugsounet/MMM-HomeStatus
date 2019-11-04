@@ -135,7 +135,7 @@ Module.register("MMM-HomeStatus", {
 					// item Cell
 					var ItemCell = document.createElement("td")
 					ItemCell.className = "HS_ITEM"
-					ItemCell.innerHTML = display ? display : item // item.replace(/_/gi, ' ')
+					ItemCell.innerHTML = display ? display : item.replace(/_/gi, ' ')
 					StatusRow.appendChild(ItemCell)
 
 					// Infos Cell
