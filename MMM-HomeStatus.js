@@ -136,7 +136,6 @@ Module.register("MMM-HomeStatus", {
 			   var name = value.name
 			   var app = value.app
 			   var source = value.source
-			   var switched
 
 			   for (var i in display) { // search in module (multi display)
 			   	var StatusRow = document.createElement("tr")
@@ -151,7 +150,7 @@ Module.register("MMM-HomeStatus", {
 					// Infos Cell
 					var InfoCell = document.createElement("td")
 					InfoCell.className = "HS_INFO"
-					if (status) { // device is on ?
+					if (status[i]) { // device is on ?
 						if (color && color[i]) { // MagicHome Color
 							var rgb = "rgb(" + color[i].red + "," + color[i].green + "," + color[i].blue + ")"
 							InfoCell.style.backgroundColor = rgb
