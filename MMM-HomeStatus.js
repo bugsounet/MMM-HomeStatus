@@ -103,7 +103,7 @@ Module.register("MMM-HomeStatus", {
 				clearInterval(self.interval);
 				self.sendSocketNotification("SCAN", false);
             		}
-	    		self.updateDom();
+	    		// self.updateDom(); <----- why ?
         	}, 1000);
         },
 

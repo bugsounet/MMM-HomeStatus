@@ -340,7 +340,7 @@ module.exports = NodeHelper.create({
 			this.HomeStatus.Internet.status[0] = self.INTERNET_status;
 			this.HomeStatus.Internet.ping = self.INTERNET_ping;
 		}
-		console.log(this.HomeStatus)
+		//console.log(this.HomeStatus)
 		self.sendSocketNotification("RESULT", this.HomeStatus);
             } , 4000);
         }
