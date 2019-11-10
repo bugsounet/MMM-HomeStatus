@@ -20,6 +20,9 @@ Module.register("MMM-HomeStatus", {
 				https_port: 0
 			}
 		},
+		Freebox_Crystal: {
+			active: false,
+		},
 		TV: {
 			active: false,
 			display: [],

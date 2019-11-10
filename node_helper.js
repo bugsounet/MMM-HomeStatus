@@ -42,7 +42,6 @@ module.exports = NodeHelper.create({
     start: function() {
         console.log('Démarrage du node_helper pour le module ' + this.name + '...');
 	this.Magic_data = []
-	this.FB_display = [ 'Freebox Player' ]
 	this.FB_status = []
 	this.TV_status = []
 	this.TV_source = []
@@ -52,9 +51,12 @@ module.exports = NodeHelper.create({
 	this.XBOX_app = []
 	this.INTERNET_status = []
 	this.INTERNET_ping = '0'
-	this.FBS_diplay = [ 'FreeBox Server' ]
 	this.FBS_status = []
 	this.FBS_rate = '0'
+	this.FBCrystal_display = [ 'Freebox Crystal' ]
+	this.FBCrystal_rate = '0'
+	this.FBCrystal_up = '0'
+	this.FBCrystal_down= '0'
 
 	this.HomeStatus = {
 		"Light": {
@@ -241,8 +243,29 @@ module.exports = NodeHelper.create({
 	});
     },
 
+    FBCrystal : function () {
+	var self = this
+	var up = "curl -s http://mafreebox.free.fr/pub/fbx_info.txt | grep -a ATM | awk '{print $5}'"
+	var down = "curl -s http://mafreebox.free.fr/pub/fbx_info.txt | grep -a ATM | awk '{print $3}'"
+	exec (down,(err, stdout, stderr)=>{
+		if (err == null) {
+			self.FBCrystal_down = stdout.trim()
+			exec (up,(err, stdout, stderr)=>{
+				if (err == null) {
+					self.FBCrystal_up = stdout.trim()
+					self.FBCrystal_rate = self.FBCrystal_down + "/" + self.FBCrystal_up
+				}
+			})
+		} else {
+			self.FBCrystal_down = '0'
+			self.FBCrystal_up = '0'
+		}
+	})
+    },
+
     HomeScan: function() {
 	var self = this;
+
 	if (self.config.MagicHome.active) {
 			for(var i in self.config.MagicHome.ip) this.magic_query(self.config.MagicHome.ip[i],i);
 	}
@@ -267,6 +290,8 @@ module.exports = NodeHelper.create({
 			self.FBS_rate = 0;
 		}
 	}
+	if (self.config.Freebox_Crystal.active) this.FBCrystal();
+
 	if (self.config.Xbox.active) for(var i in self.config.Xbox.ip) this.xbox_Status(self.config.Xbox.ip[i],i);
 	if (self.config.Internet.active) this.internet_Status();
     },
@@ -287,6 +312,7 @@ module.exports = NodeHelper.create({
 				console.log("[HomeStatus] Module Freebox Player: " + this.config.Freebox.player_ip + " -> " + self.FB_status);
 				console.log("[HomeStatus] Module Freebox Server: " + this.config.Freebox.server_ip + " -> " + self.FBS_status + " (" + self.FBS_rate +")");
 			}
+			if (this.config.Freebox_Crystal.active) console.log("[HomeStatus] Module Freebox Crystal: mafreebox.free.fr -> " + self.FBCrystal_rate);
 			if (this.config.TV.active) {
 				for(var i in self.config.TV.ip) console.log("[HomeStatus] Module TV: " + this.config.TV.ip[i] + " -> " + this.config.TV.display[i] + " : " + self.TV_status[i] + " (" + self.TV_source[i] + ")");
 			}
@@ -296,7 +322,9 @@ module.exports = NodeHelper.create({
 			if (this.config.Xbox.active) {
 					for(var i in self.config.Xbox.ip) console.log("[HomeStatus] Module XBOX: " + this.config.Xbox.ip[i] + " -> " + this.config.Xbox.display[i] + " : " + self.XBOX_status[i] + " (" + self.XBOX_app[i] + ")");
 			}
+
 			console.log("[HomeStatus] All informations collected !");
+
 		}
 
 		if (this.config.MagicHome.active) {
@@ -315,6 +343,15 @@ module.exports = NodeHelper.create({
 			this.HomeStatus.Freebox_Server.active = true;
 			this.HomeStatus.Freebox_Server.status[0] = self.FBS_status;
 			this.HomeStatus.Freebox_Server.rate = self.FBS_rate;
+		}
+		if (this.config.Freebox_crystal.active) {
+			// on envoi les données vers le Freebox Server
+			if (self.FBCrystal_down > 0) self.FBCrystal_status = true;
+			else self.FBCrystal_status = false;
+			this.HomeStatus.Freebox_Server.active = true;
+			this.HomeStatus.Freebox_Server.status[0] = self.FBCrystal_status;
+			this.HomeStatus.Freebox_Server.rate = self.FBCrystal_rate;
+			this.HomeStatus.Freebox_Server.display = self.FBCrystal_display
 		}
 		if (this.config.TV.active) {
 			this.HomeStatus.TV.active = true;
