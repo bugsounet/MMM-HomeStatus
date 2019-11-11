@@ -262,6 +262,8 @@ module.exports = NodeHelper.create({
 			this.tv_Status(self.config.TV.ip[i],i);
 			if (self.TV_status[i]) this.tv_Source(self.config.TV.command[i],i);
 		}
+		this.tv_Status(self.config.TV.ip);
+		if (self.TV_status) this.tv_Source(self.config.TV.command);
 	}
 	if (self.config.PC.active) {
 		for(var i in self.config.PC.ip) {
