@@ -25,19 +25,10 @@ It displays the status of the modules and information if they are available
 ```
 git clone https://github.com/bugsounet/MMM-HomeStatus.git
 cd MMM-HomeStatus
-npm install
+sh install.sh
 ```
 
-if you use the Freebox module, you must register the application in your freebox server
-
-```
-sh Freebox_Login.sh
-```
-Please check your Freebox Server LCD screen and authorize application access to register your app.
-
-Your app has been granted access !
-
-Save safely those following informations secret to connect to your Freebox
+if you use Freebox Module : Save safely those following informations secret to connect to your Freebox
 ```
 { app_token: '<token>',
   app_id: 'fbx.HomeStatus',
@@ -127,5 +118,67 @@ To display the module insert it in the config.js file.
 },
 
 ```
+You can display more than one device in MagicHome, TV, PC and Xbox modules
+
+example if you want to display 2 Xbox One :
+
+ips are: 192.168.0.20 (Xbox 1) and 192.168.0.21 (Xbox 2)
+```
+		Xbox: {
+			active: true, // activation du module
+			ip: [
+				"192.168.0.20", // ip1
+                                "192.168.0.21" // ip2
+			],
+			display: [
+				"Xbox 1", // display of ip1
+                                "Xbox 2" // display of ip2
+			]
+		},
+```
+
+example of complete configuration with 2 MagicHome devices, 2 PC, and internet scan
+
+```
+{
+	module: "MMM-HomeStatus",
+	header: "Home Status",
+	position: "top_center",
+	config: {
+		delay: 10 * 1000,
+		debug: false,
+		MagicHome: {
+			active: true,
+			ip: [
+				"192.168.0.22", // ip1 device
+				"192.168.0.23" // ip2 device
+			],
+			display: [
+				"Light 1", // name to display for ip1
+				"Light 2" // name to display for ip2
+			]
+		},
+		PC: {
+			active: true,
+			ip: [
+				"192.168.0.17", // ip1 device
+				"192.168.0.38" // ip2 device
+			],
+			display: [
+				"PC 1", // name to display for ip1
+				"PC 2" // name to display for ip2
+			]
+		}
+		Internet: {
+			active: true,
+			scan: "google.fr",
+			display: [ "Internet" ]
+		}
+	}
+},
+```
+## Note
+You have to put a fixed ip on devices
 
 ## Change Log
+* 2019/11/11 Initial Public Release
