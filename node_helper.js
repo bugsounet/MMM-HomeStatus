@@ -332,7 +332,7 @@ module.exports = NodeHelper.create({
 			this.HomeStatus.Freebox_Server.status[0] = self.FBS_status;
 			this.HomeStatus.Freebox_Server.rate = self.FBS_rate;
 		}
-		if (this.config.Freebox_crystal.active) {
+		if (this.config.Freebox_Crystal.active) {
 			// on envoi les données vers le Freebox Server
 			if (self.FBCrystal_down > 0) self.FBCrystal_status = true;
 			else self.FBCrystal_status = false;
