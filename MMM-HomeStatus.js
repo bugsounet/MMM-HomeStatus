@@ -8,7 +8,7 @@ Module.register("MMM-HomeStatus", {
 			display: [],
 			ip: []
 		},
-		Freebox: {
+		Freebox_V6: {
 			active: false,
 			player_ip: "",
 			server_ip: "",

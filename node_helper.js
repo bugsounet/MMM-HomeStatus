@@ -269,11 +269,11 @@ module.exports = NodeHelper.create({
 			if (self.PC_status[i]) this.pc_Name(self.config.PC.ip[i],i);
 		}
 	}
-	if (self.config.Freebox.active) {
-		this.FBplayer_Status(self.config.Freebox.player_ip);
-	    	this.FBserver_Status(self.config.Freebox.server_ip);
-		if (self.config.Freebox.rate.active && self.FBS_status) {
-			this.FBserver_Rate(self.config.Freebox.rate.app_token,self.config.Freebox.rate.app_id,self.config.Freebox.rate.api_domain,self.config.Freebox.rate.https_port);
+	if (self.config.Freebox_V6.active) {
+		this.FBplayer_Status(self.config.Freebox_V6.player_ip);
+	    	this.FBserver_Status(self.config.Freebox_V6.server_ip);
+		if (self.config.Freebox_V6.rate.active && self.FBS_status) {
+			this.FBserver_Rate(self.config.Freebox_V6.rate.app_token,self.config.Freebox_V6.rate.app_id,self.config.Freebox_V6.rate.api_domain,self.config.Freebox_V6.rate.https_port);
 		} else {
 			self.FBS_rate = 0;
 		}
@@ -296,9 +296,9 @@ module.exports = NodeHelper.create({
 		if (this.config.debug) {
 			if (this.config.Internet.active) console.log("[HomeStatus] Module Internet: " + self.INTERNET_status + " - ping " + this.config.Internet.scan + " : " + self.INTERNET_ping + "ms");
 			if (this.config.MagicHome.active) for(var i in self.config.MagicHome.ip) console.log("[HomeStatus] Module Magic Home: " + this.config.MagicHome.ip[i] + " -> " + this.config.MagicHome.display[i] + ": " + self.Magic_data[i].on + " - Color: " + JSON.stringify(self.Magic_data[i].color));
-			if (this.config.Freebox.active) {
-				console.log("[HomeStatus] Module Freebox Player: " + this.config.Freebox.player_ip + " -> " + self.FB_status);
-				console.log("[HomeStatus] Module Freebox Server: " + this.config.Freebox.server_ip + " -> " + self.FBS_status + " (" + self.FBS_rate +")");
+			if (this.config.Freebox_V6.active) {
+				console.log("[HomeStatus] Module Freebox Player: " + this.config.Freebox_V6.player_ip + " -> " + self.FB_status);
+				console.log("[HomeStatus] Module Freebox Server: " + this.config.Freebox_V6.server_ip + " -> " + self.FBS_status + " (" + self.FBS_rate +")");
 			}
 			if (this.config.Freebox_Crystal.active) console.log("[HomeStatus] Module Freebox Crystal: mafreebox.free.fr -> " + self.FBCrystal_rate);
 			if (this.config.TV.active) {
@@ -323,7 +323,7 @@ module.exports = NodeHelper.create({
 				this.HomeStatus.Light.color[i] = self.Magic_data[i].color;
 			}
 		}
-		if (this.config.Freebox.active) {
+		if (this.config.Freebox_V6.active) {
 			// Freebox Player
 			this.HomeStatus.Freebox_Player.active = true;
 			this.HomeStatus.Freebox_Player.status[0] = self.FB_status;
