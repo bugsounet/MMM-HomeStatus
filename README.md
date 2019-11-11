@@ -39,6 +39,9 @@ if you use Freebox Module : Save safely those following informations secret to c
 }
 ```
 
+## Screenshoot
+![](https://github.com/bugsounet/MMM-HomeStatus/blob/master/screen.jpg)
+
 ## Configuration
 
 To display the module insert it in the config.js file. 
