@@ -185,6 +185,7 @@ module.exports = NodeHelper.create({
 		self.XBOX_status[nb] = false;
 		self.XBOX_app[nb] = null;
 	});
+
 	if (self.XBOX_status[nb]) {
 		//console.log("It's Turn on ... Go!");
 		sgClient.on('_on_console_status', function(message, xbox, remote, smartglass){
@@ -193,23 +194,10 @@ module.exports = NodeHelper.create({
 					if(deviceStatus.current_app != message.packet_decoded.protected_payload.apps[0].aum_id){
 						deviceStatus.current_app = message.packet_decoded.protected_payload.apps[0].aum_id;
 						self.XBOX_app[nb] = deviceStatus.current_app;
-						self.xbox_Game(nb);
 					}
 				}
 		}.bind(deviceStatus));
 	}
-    },
-
-    xbox_Game: function(nb) { // !!!! temporary resolve name of the game !!!!
-	var self = this;
-	if(self.XBOX_app[nb]) {
-                        var str = self.XBOX_app[nb]
-                        var split = str.split('!');
-                        //console.log("!!!!!!!!! " + split[0] + " --- " + split[1]);
-                        var res = split[1];
-                        if (res == "Xbox.Dashboard.Application" ) res = "Accueil"
-                        self.XBOX_app[nb] = res;
-                }
     },
 
     FBplayer_Status: function(ip) {
@@ -381,5 +369,6 @@ module.exports = NodeHelper.create({
 		self.sendSocketNotification("RESULT", this.HomeStatus);
             } , 4000);
         }
-    }
+    },
+
 });

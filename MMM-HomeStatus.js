@@ -77,6 +77,7 @@ Module.register("MMM-HomeStatus", {
 		this.config = this.configAssignment({}, this.defaults, this.config);
 		this.Init = false;
 		this.HomeStatus = {};
+		this.XboxDB = {};
 	},
 
 	notificationReceived: function (notification, payload) {
@@ -84,6 +85,7 @@ Module.register("MMM-HomeStatus", {
         	if (notification === 'DOM_OBJECTS_CREATED') {
             		//DOM creation complete, let's start the module
             		this.sendSocketNotification("SCAN", this.config);
+			this.readDB(); // Lit la Base de donnée Xbox
         	}
 	},
 	socketNotificationReceived: function (notification, payload) {
@@ -106,7 +108,6 @@ Module.register("MMM-HomeStatus", {
 				clearInterval(self.interval);
 				self.sendSocketNotification("SCAN", false);
             		}
-	    		// self.updateDom(); <----- why ?
         	}, 1000);
         },
 
@@ -139,6 +140,7 @@ Module.register("MMM-HomeStatus", {
 			   var name = value.name
 			   var app = value.app
 			   var source = value.source
+			   var new_title = false;
 
 			   for (var i in display) { // search in module (multi display)
 			   	var StatusRow = document.createElement("tr")
@@ -158,19 +160,27 @@ Module.register("MMM-HomeStatus", {
 							var rgb = "rgb(" + color[i].red + "," + color[i].green + "," + color[i].blue + ")"
 							InfoCell.style.backgroundColor = rgb
 							InfoCell.style.borderRadius = "25px"
-							InfoCell.style.width = "100px"
+							InfoCell.style.width = "200px"
 						}
 						if (ping && ping != null) InfoCell.innerHTML = ping + " ms" // ping internet
 						if (rate && rate !=0) InfoCell.innerHTML = rate // rate Freebox
 						if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i] // name PC
-						if (app && app[i] && app[i] != null) InfoCell.innerHTML = app[i] // name of Xbox app
+						if (app && app[i] && app[i] != null) {
+							for ( var nb in self.XboxDB ) { // search title app in xbox db
+								if(self.XboxDB[nb][0] == app[i]) {
+									InfoCell.innerHTML = self.XboxDB[nb][1];
+									new_title = true;
+								}
+							}
+							if(!new_title) InfoCell.innerHTML = "-!!!- Titre Inconnu"
+						}
 						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
 					}
 					StatusRow.appendChild(InfoCell)
 
 					// Need Space ?
 					var SpaceCell = document.createElement("td")
-					SpaceCell.style.width = "30px"
+					SpaceCell.style.width = "15px"
 					StatusRow.appendChild(SpaceCell)
 
 					//switch Cell
@@ -211,5 +221,65 @@ Module.register("MMM-HomeStatus", {
 	getStyles: function() {
 		return ["MMM-HomeStatus.css"]
   },
+
+
+ // for read xbox.db i use eouia MMM-Timetable Code :) 
+
+  readDB: function () {
+    var self = this;
+    var url = "/modules/MMM-HomeStatus/xbox.db"
+    var xmlHttp = new XMLHttpRequest()
+    xmlHttp.onreadystatechange = () => {
+      var res = []
+      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        var lines = xmlHttp.responseText.split(/[\r\n]+/)
+        if (lines.length > 0) {
+          for(var i = 0; i < lines.length; i++) {
+            var line = lines[i]
+            if (line != "") {
+              var a = this.DBToArray(line, ",")
+              res.push(a[0])
+            }
+          }
+          self.XboxDB = res;
+        }
+      }
+    }
+    xmlHttp.open("GET", url, true)
+    xmlHttp.send(null)
+  },
+
+  DBToArray: function (strData, strDelimiter){
+    strDelimiter = (strDelimiter || ",")
+    var objPattern = new RegExp(
+      (
+        "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+        "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+        "([^\"\\" + strDelimiter + "\\r\\n]*))"
+      ),
+      "gi"
+      )
+    var arrData = [[]]
+    var arrMatches = null
+    while (arrMatches = objPattern.exec( strData )){
+      var strMatchedDelimiter = arrMatches[ 1 ]
+      if (
+        strMatchedDelimiter.length &&
+        (strMatchedDelimiter != strDelimiter)
+        ){
+        arrData.push( [] )
+      }
+      if (arrMatches[ 2 ]){
+        var strMatchedValue = arrMatches[ 2 ].replace(
+          new RegExp( "\"\"", "g" ),
+          "\""
+          )
+      } else {
+        var strMatchedValue = arrMatches[ 3 ]
+      }
+      arrData[ arrData.length - 1 ].push( strMatchedValue )
+    }
+    return( arrData )
+  }
 
 });
