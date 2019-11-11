@@ -85,7 +85,6 @@ Module.register("MMM-HomeStatus", {
         	if (notification === 'DOM_OBJECTS_CREATED') {
             		//DOM creation complete, let's start the module
             		this.sendSocketNotification("SCAN", this.config);
-			//this.readDB(); // Lit la Base de donnée Xbox
         	}
 		if (notification === 'XBOXDB_UPDATE') {
 			// demande une nouvelle base de donnée depuis GitHub
@@ -314,24 +313,23 @@ Module.register("MMM-HomeStatus", {
     return( arrData )
   },
 
-  // TelegramBot Command ... a tester
-/*
+  // TelegramBot Command
+
   getCommands: function () {
     return [
       {
         command: "updateDB",
         callback: "telegramCommand",
-        description: "Vous pouvez forcer la mise à jour de la base de donnée du module XBOX avec cette commande."
+        description: "Vous pouvez forcer la mise à jour de la base de donnée du module Xbox avec cette commande."
       },
     ]
   },
 
   telegramCommand: function(command, handler) {
-    if (command == "updateDB" && handler.args) {
-      handler.reply("TEXT", "La demande de mise à jour a été demandé")
+    if (command == "updateDB") {
+      handler.reply("TEXT", "La demande de mise à jour a été envoyé")
       this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
     }
   },
-*/
 
 });
