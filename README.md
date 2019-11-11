@@ -181,7 +181,20 @@ example of complete configuration with 2 MagicHome devices, 2 PC, and internet s
 },
 ```
 ## Note
-You have to put a fixed ip on devices
+* You have to put a fixed ip on devices
+* Need help to create the Xbox database!
+
+If an app / game displays on screen: -!!!- Titre Inconnu
+
+Set the debug mode to true in the configuration
+
+Send me the Xbox notification
+
+I will add it to the Xbox database
+```
+[HomeStatus] XBOX Module: 192.168.0.39 -> Xbox One X: true (SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App)
+```
+-> Spotify 
 
 ## Change Log
 * 2019/11/11 Initial Public Release
