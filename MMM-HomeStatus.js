@@ -85,18 +85,27 @@ Module.register("MMM-HomeStatus", {
         	if (notification === 'DOM_OBJECTS_CREATED') {
             		//DOM creation complete, let's start the module
             		this.sendSocketNotification("SCAN", this.config);
-			this.readDB(); // Lit la Base de donnée Xbox
+			//this.readDB(); // Lit la Base de donnée Xbox
         	}
+		if (notification === 'XBOXDB_UPDATE') {
+			// demande une nouvelle base de donnée depuis GitHub
+			this.sendSocketNotification("UpdateDB", false);
+		}
 	},
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === "RESULT") {
 			this.Init = true;
 			this.HomeStatus = payload;
-			this.resetCountdown();
+			this.IntervalScanDevice();
+		}
+		if (notification === "UPDATED") {
+			// Mise a jour effectué -> recharge la nouvelle base de donnée Xbox
+			this.XboxDBReload();
+			if (payload) this.IntervalScanDB(); // lance une tempo de scan si le payload est sur true
 		}
 	},
 
-        resetCountdown: function () {
+        IntervalScanDevice: function () {
         	var self = this;
 			clearInterval(self.interval);
 			self.counter = this.config.delay;
@@ -109,6 +118,20 @@ Module.register("MMM-HomeStatus", {
 				self.sendSocketNotification("SCAN", false);
             		}
         	}, 1000);
+        },
+
+        IntervalScanDB: function () {
+                var self = this;
+                        clearInterval(self.intervalDB);
+                        self.counterDB = 4 * 60 * 60 * 1000 // mise a jour tous les 4 heures
+
+                self.intervalDB = setInterval(function () {
+                        self.counterDB -= 1000;
+                        if (self.counterDB <= 0) {
+                                clearInterval(self.intervalDB);
+                                self.sendSocketNotification("UpdateDB",true);
+                        }
+                }, 1000);
         },
 
 	getDom: function () {
@@ -155,15 +178,15 @@ Module.register("MMM-HomeStatus", {
 					// Infos Cell
 					var InfoCell = document.createElement("td")
 					InfoCell.className = "HS_INFO"
+					InfoCell.style.width = "200px"
 					if (status[i]) { // device is on ?
 						if (color && color[i]) { // MagicHome Color
 							var rgb = "rgb(" + color[i].red + "," + color[i].green + "," + color[i].blue + ")"
 							InfoCell.style.backgroundColor = rgb
 							InfoCell.style.borderRadius = "25px"
-							InfoCell.style.width = "200px"
 						}
 						if (ping && ping != null) InfoCell.innerHTML = ping + " ms" // ping internet
-						if (rate && rate !=0) InfoCell.innerHTML = rate // rate Freebox
+						if (rate && rate !=0) InfoCell.innerHTML = rate + " kbit/s"// rate Freebox
 						if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i] // name PC
 						if (app && app[i] && app[i] != null) {
 							for ( var nb in self.XboxDB ) { // search title app in xbox db
@@ -172,7 +195,10 @@ Module.register("MMM-HomeStatus", {
 									new_title = true;
 								}
 							}
-							if(!new_title) InfoCell.innerHTML = "-!!!- Titre Inconnu"
+							if(!new_title) {
+								InfoCell.innerHTML = "-!!!- Titre Inconnu";
+								console.log("[HomeStatus] Xbox Title ? " + app[i])
+							}
 						}
 						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
 					}
@@ -222,12 +248,17 @@ Module.register("MMM-HomeStatus", {
 		return ["MMM-HomeStatus.css"]
   },
 
+  XboxDBReload: function () {
+    var self = this;
+    self.XboxDB = {};
+    this.readDB();
+  },
 
  // for read xbox.db i use eouia MMM-Timetable Code :) 
 
   readDB: function () {
     var self = this;
-    var url = "/modules/MMM-HomeStatus/xbox.db"
+    var db = "/modules/MMM-HomeStatus/xbox.db"
     var xmlHttp = new XMLHttpRequest()
     xmlHttp.onreadystatechange = () => {
       var res = []
@@ -242,10 +273,11 @@ Module.register("MMM-HomeStatus", {
             }
           }
           self.XboxDB = res;
+	  console.log("[HomeStatus] Title Loaded in Xbox Database : " + self.XboxDB.length)
         }
       }
     }
-    xmlHttp.open("GET", url, true)
+    xmlHttp.open("GET", db, true)
     xmlHttp.send(null)
   },
 
@@ -280,6 +312,26 @@ Module.register("MMM-HomeStatus", {
       arrData[ arrData.length - 1 ].push( strMatchedValue )
     }
     return( arrData )
-  }
+  },
+
+  // TelegramBot Command ... a tester
+/*
+  getCommands: function () {
+    return [
+      {
+        command: "updateDB",
+        callback: "telegramCommand",
+        description: "Vous pouvez forcer la mise à jour de la base de donnée du module XBOX avec cette commande."
+      },
+    ]
+  },
+
+  telegramCommand: function(command, handler) {
+    if (command == "updateDB" && handler.args) {
+      handler.reply("TEXT", "La demande de mise à jour a été demandé")
+      this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
+    }
+  },
+*/
 
 });

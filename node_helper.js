@@ -1,4 +1,5 @@
 const { Control, Discovery }  = require('magic-home');
+const path = require("path")
 var request = require('request');
 var NodeHelper = require('node_helper');
 var ping = require('ping');
@@ -251,6 +252,16 @@ module.exports = NodeHelper.create({
 	})
     },
 
+    updateDB: function(payload) {
+	var self = this;
+    	var dir = path.resolve(__dirname, "")
+    	var cmd = "cd " + dir + "; cp xbox.db xbox.db.sav ; rm xbox.db ; git checkout xbox.db"
+    	exec(cmd, (e,so,se)=>{
+      		console.log("[HomeStatus] Fresh Update of the xbox database")
+		self.sendSocketNotification("UPDATED", payload)
+    	})
+    },
+
     HomeScan: function() {
 	var self = this;
 
@@ -287,7 +298,10 @@ module.exports = NodeHelper.create({
     socketNotificationReceived: function(notification, payload) {
         if (notification === 'SCAN') {
 	    var self = this;
-	    if (payload) this.config = payload;
+	    if (payload) {
+		this.config = payload;
+		this.updateDB(true);
+	    }
 
 	    if (this.config.debug) console.log("[HomeStatus] Collecting devices informations ...");
 	    this.HomeScan();
@@ -369,6 +383,9 @@ module.exports = NodeHelper.create({
 		self.sendSocketNotification("RESULT", this.HomeStatus);
             } , 4000);
         }
+	if (notification === 'UpdateDB') {
+		this.updateDB(payload);
+	}
     },
 
 });
