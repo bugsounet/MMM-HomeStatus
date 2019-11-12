@@ -322,6 +322,11 @@ Module.register("MMM-HomeStatus", {
         callback: "telegramCommand",
         description: "Vous pouvez forcer la mise à jour de la base de donnée du module Xbox avec cette commande."
       },
+      {
+	command: "homestatus",
+	callback: "telegramCommand",
+	description: "Affiche l'état des péripheriques IOT"
+      },
     ]
   },
 
@@ -330,6 +335,75 @@ Module.register("MMM-HomeStatus", {
       handler.reply("TEXT", "La demande de mise à jour a été envoyé")
       this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
     }
+    if (command == "homestatus") {
+      this.cmd_homestatus(handler);
+    }
+  },
+
+  cmd_homestatus: function(handler) {
+      var self = this
+      var data = self.HomeStatus
+      var text = ""
+      if (Object.keys(data).length > 0) {
+      	for (let [item, value] of Object.entries(data)) {
+		var activate = value.active
+		var display = value.display
+		var status = value.status
+		var color = value.color
+		var ping = value.ping
+		var rate = value.rate
+		var name = value.name
+		var app = value.app
+		var source = value.source
+		var new_title = false;
+
+		for (var i in display) {
+			if (activate) {
+				var end = false
+				//text += "*" + display[i]
+				if (status[i]) {
+					text += "*ON -- " + display[i]
+					/* how to display color !?
+					if (color && color[i]) {
+						text += ":* Color ? \n"
+						end = true
+					}
+					*/
+					if (ping && ping != null) {
+						text +=  ":* " + ping + " ms\n"
+						end = true
+					}
+					if (rate && rate !=0) {
+						text += ":* " + rate + " kbit/s\n"
+						end = true
+					}
+					if (name && name[i] && name[i] != null) {
+						text += ": * " + name[i] + "\n"
+						end = true
+					}
+					if (app && app[i] && app[i] != null) {
+						for ( var nb in self.XboxDB )
+							if(self.XboxDB[nb][0] == app[i]) {
+								text += ":* " + self.XboxDB[nb][1] + "\n"
+								new_title = true;
+								end = true
+							}
+						if(!new_title) {
+							text += ": * -!!!- Titre Inconnu\n"
+							end = true
+						}
+					}
+					if (source && source[i] && source[i] != null) {
+						text += ": * " + source[i] + "\n"
+						end = true
+					}
+					if (!end) text += "*\n"
+				} else text += "*OFF -- " + display[i] + "*\n"
+			}
+		}
+	}
+	handler.reply('TEXT', text, {parse_mode:'Markdown'})
+     }
   },
 
 });
