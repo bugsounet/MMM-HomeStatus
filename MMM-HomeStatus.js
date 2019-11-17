@@ -280,7 +280,7 @@ Module.register("MMM-HomeStatus", {
           }
           self.XboxDB = res;
 	  self.VersionDB = self.XboxDB[0][1] + "." + self.XboxDB[0][2]
-	  this.sendSocketNotification("UPDATED_OK", "[HomeStatus] Title Loaded in Xbox Database : " + (self.XboxDB.length-1) + " -- Version : " + self.VersionDB)
+	  this.sendSocketNotification("UPDATED_OK", "[HomeStatus] Title Loaded in Xbox Database : " + (self.XboxDB.length-3) + " -- Version : " + self.VersionDB)
         }
       }
     }
