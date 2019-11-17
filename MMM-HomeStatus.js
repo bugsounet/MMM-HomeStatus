@@ -191,7 +191,7 @@ Module.register("MMM-HomeStatus", {
 						if (app && app[i] && app[i] != null) {
 							for ( var nb in self.XboxDB ) { // search title app in xbox db
 								if(self.XboxDB[nb][0] == app[i]) {
-									InfoCell.innerHTML = self.XboxDB[nb][1]
+									InfoCell.innerHTML = this.translate(self.XboxDB[nb][1])
 									new_title = true;
 								}
 							}
@@ -239,6 +239,12 @@ Module.register("MMM-HomeStatus", {
 			return wrapper
 		}
 	},
+
+  	getTranslations: function() {
+    		return {
+      			fr: "translations/fr.json",
+    		}
+  	},
 
     	getScripts: function () {
         	return ["moment.js"];

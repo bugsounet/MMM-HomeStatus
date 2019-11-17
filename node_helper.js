@@ -256,10 +256,10 @@ module.exports = NodeHelper.create({
 	var self = this;
     	var dir = path.resolve(__dirname, "")
     	var cmd = "cd " + dir + "; cp xbox.db xbox.db.sav ; rm xbox.db ; git checkout xbox.db"
-    	exec(cmd, (e,so,se)=>{
+    	//exec(cmd, (e,so,se)=>{
       		console.log("[HomeStatus] Fresh Update of the xbox database")
 		self.sendSocketNotification("UPDATED", payload)
-    	})
+    	//})
     },
 
     HomeScan: function() {
@@ -386,6 +386,8 @@ module.exports = NodeHelper.create({
 	if (notification === 'UpdateDB') {
 		this.updateDB(payload);
 	}
+	if (notification === 'LOG') console.log("[HomeStatus] Xbox Database: Please ask update of the title " + payload) 
+	if (notification === 'UPDATED_OK') console.log(payload) 
     },
 
 });
