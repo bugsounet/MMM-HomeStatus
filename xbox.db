@@ -1,5 +1,6 @@
-Version,20191115,1647
-Xbox.Dashboard_8wekyb3d8bbwe!Xbox.Dashboard.Application,Dashboard,app
+Version,20191117,1000
+
+#Games
 GTA-V_vesz1v3mcwykm!GTAV,GTA V,game
 Sunrise_8wekyb3d8bbwe!ReleaseFinalDx12,Forza Horizon 4,game
 FishingSimWorld34CC32FA_qk15qyvsvhj3w!AppFishingSimWorld,Fishing Sim World,game
@@ -11,6 +12,9 @@ Microsoft.HalifaxBaseGame_8wekyb3d8bbwe!HalifaxGameShip,Gears 5,game
 ACE-Europe_a43ghgr8ekz80!WarchestShip, Halo: The Master Chief Collection,game
 NFS18_zwks512sysnyr!Race.App,Need for Speed Payback,game
 ACEUS1DEC71AF_b6krnev7r9sf8!scimitar.DX12.FX,Assassin's Creed Origins,game
+
+#Apps
+Xbox.Dashboard_8wekyb3d8bbwe!Xbox.Dashboard.Application,Home,app
 Microsoft.WindowsStore_8wekyb3d8bbwe!App,Microsoft Store,app
 CANALGroupe.CANALTOUCH_4d0jsvmsaqz2m!App,My Canal,app
 Deezer.62021768415AF_q7m17pa7q8kj0!App,Deezer,app
@@ -19,3 +23,20 @@ GoogleInc.YouTube_yfg5n0ztvskxp!App,YouTube,app
 Microsoft.Xbox.LiveTV_8wekyb3d8bbwe!Microsoft.Xbox.LiveTV.Application,TV,app
 4DF9E0F8.Netflix_mcm4njqhnhss8!App,Netflix,app
 SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App,Spotify,app
+Microsoft.Xbox.Settings_8wekyb3d8bbwe!Xbox.Settings.Application,Settings,app
+Microsoft.XboxCare_8wekyb3d8bbwe!App,Xbox Assist,app
+Microsoft.ZuneMusic_8wekyb3d8bbwe!Microsoft.ZuneMusic,Groove Music,app
+Microsoft.MicrosoftEdge_8wekyb3d8bbwe!MicrosoftEdge,Microsoft Edge,app
+Microsoft.MicrosoftRewardsonXbox_8wekyb3d8bbwe!App,Microsoft Rewards,app
+Microsoft.XboxBeam_8wekyb3d8bbwe!App,Mixer,app
+AmazonVideo.AmazonPrimeVideo_pwbj9vvecjh7j!App,Prime Video,app
+TwitchInteractive.TwitchApp_7kd9w9e3c5jra!Twitch,Twitch,app
+Microsoft.BlurayPlayer_8wekyb3d8bbwe!Xbox.BlurayPlayer.Application,Blu-ray Player,app
+e1ed6636-fb01-440d-9af5-ee0b82a12072_n8p1nce9y4t28!App,Forza Hub,app
+HaloChannel_8wekyb3d8bbwe!App,Halo Channel,app
+Microsoft.ZuneVideo_8wekyb3d8bbwe!Microsoft.ZuneVideo,Movies,app
+Ubisoft.16898A56DAAC1_ngz4m417e0mpw!App,Ubisoft Club,app
+Microsoft.XboxDevices_8wekyb3d8bbwe!App,Xbox Accessories,app
+Microsoft.XboxIdentity_8wekyb3d8bbwe!Microsoft.XboxIdentity,Xbox Avatar Editor,app
+Microsoft.FlightDashboard_8wekyb3d8bbwe!FlightDashboard.Application,Xbox Insider Hub,app
+Microsoft.Avatars_8wekyb3d8bbwe!Microsoft.Avatars,Xbox Original Avatars,app
