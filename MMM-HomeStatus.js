@@ -78,6 +78,7 @@ Module.register("MMM-HomeStatus", {
 		this.Init = false;
 		this.HomeStatus = {};
 		this.XboxDB = {};
+		this.VersionDB = ""
 	},
 
 	notificationReceived: function (notification, payload) {
@@ -85,18 +86,26 @@ Module.register("MMM-HomeStatus", {
         	if (notification === 'DOM_OBJECTS_CREATED') {
             		//DOM creation complete, let's start the module
             		this.sendSocketNotification("SCAN", this.config);
-			this.readDB(); // Lit la Base de donnée Xbox
         	}
+		if (notification === 'XBOXDB_UPDATE') {
+			// demande une nouvelle base de donnée depuis GitHub
+			this.sendSocketNotification("UpdateDB", false);
+		}
 	},
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === "RESULT") {
 			this.Init = true;
 			this.HomeStatus = payload;
-			this.resetCountdown();
+			this.IntervalScanDevice();
+		}
+		if (notification === "UPDATED") {
+			// Mise a jour effectué -> recharge la nouvelle base de donnée Xbox
+			this.XboxDBReload();
+			if (payload) this.IntervalScanDB(); // lance une tempo de scan si le payload est sur true
 		}
 	},
 
-        resetCountdown: function () {
+        IntervalScanDevice: function () {
         	var self = this;
 			clearInterval(self.interval);
 			self.counter = this.config.delay;
@@ -109,6 +118,20 @@ Module.register("MMM-HomeStatus", {
 				self.sendSocketNotification("SCAN", false);
             		}
         	}, 1000);
+        },
+
+        IntervalScanDB: function () {
+                var self = this;
+                        clearInterval(self.intervalDB);
+                        self.counterDB = 4 * 60 * 60 * 1000 // mise a jour tous les 4 heures
+
+                self.intervalDB = setInterval(function () {
+                        self.counterDB -= 1000;
+                        if (self.counterDB <= 0) {
+                                clearInterval(self.intervalDB);
+                                self.sendSocketNotification("UpdateDB",true);
+                        }
+                }, 1000);
         },
 
 	getDom: function () {
@@ -155,24 +178,27 @@ Module.register("MMM-HomeStatus", {
 					// Infos Cell
 					var InfoCell = document.createElement("td")
 					InfoCell.className = "HS_INFO"
+					InfoCell.style.width = "200px"
 					if (status[i]) { // device is on ?
 						if (color && color[i]) { // MagicHome Color
 							var rgb = "rgb(" + color[i].red + "," + color[i].green + "," + color[i].blue + ")"
 							InfoCell.style.backgroundColor = rgb
 							InfoCell.style.borderRadius = "25px"
-							InfoCell.style.width = "200px"
 						}
 						if (ping && ping != null) InfoCell.innerHTML = ping + " ms" // ping internet
-						if (rate && rate !=0) InfoCell.innerHTML = rate // rate Freebox
+						if (rate && rate !=0) InfoCell.innerHTML = rate + " kbit/s"// rate Freebox
 						if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i] // name PC
 						if (app && app[i] && app[i] != null) {
 							for ( var nb in self.XboxDB ) { // search title app in xbox db
 								if(self.XboxDB[nb][0] == app[i]) {
-									InfoCell.innerHTML = self.XboxDB[nb][1];
+									InfoCell.innerHTML = this.translate(self.XboxDB[nb][1])
 									new_title = true;
 								}
 							}
-							if(!new_title) InfoCell.innerHTML = "-!!!- Titre Inconnu"
+							if(!new_title) {
+								InfoCell.innerHTML = "-!!!- Titre Inconnu";
+								self.sendSocketNotification("LOG", app[i]); // ? better place in console node_helper
+							}
 						}
 						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
 					}
@@ -214,6 +240,12 @@ Module.register("MMM-HomeStatus", {
 		}
 	},
 
+  	getTranslations: function() {
+    		return {
+      			fr: "translations/fr.json",
+    		}
+  	},
+
     	getScripts: function () {
         	return ["moment.js"];
 	},
@@ -222,12 +254,17 @@ Module.register("MMM-HomeStatus", {
 		return ["MMM-HomeStatus.css"]
   },
 
+  XboxDBReload: function () {
+    var self = this;
+    self.XboxDB = {};
+    this.readDB();
+  },
 
  // for read xbox.db i use eouia MMM-Timetable Code :) 
 
   readDB: function () {
     var self = this;
-    var url = "/modules/MMM-HomeStatus/xbox.db"
+    var db = "/modules/MMM-HomeStatus/xbox.db"
     var xmlHttp = new XMLHttpRequest()
     xmlHttp.onreadystatechange = () => {
       var res = []
@@ -242,10 +279,12 @@ Module.register("MMM-HomeStatus", {
             }
           }
           self.XboxDB = res;
+	  self.VersionDB = self.XboxDB[0][1] + "." + self.XboxDB[0][2]
+	  this.sendSocketNotification("UPDATED_OK", "[HomeStatus] Title Loaded in Xbox Database : " + (self.XboxDB.length-1) + " -- Version : " + self.VersionDB)
         }
       }
     }
-    xmlHttp.open("GET", url, true)
+    xmlHttp.open("GET", db, true)
     xmlHttp.send(null)
   },
 
@@ -280,6 +319,103 @@ Module.register("MMM-HomeStatus", {
       arrData[ arrData.length - 1 ].push( strMatchedValue )
     }
     return( arrData )
-  }
+  },
+
+  // TelegramBot Command
+
+  getCommands: function () {
+    return [
+      {
+        command: "updatedb",
+        callback: "telegramCommand",
+        description: "Vous pouvez forcer la mise à jour de la base de donnée du module Xbox avec cette commande."
+      },
+      {
+	command: "homestatus",
+	callback: "telegramCommand",
+	description: "Affiche l'état des péripheriques IOT"
+      },
+      {
+	command: "versiondb",
+	callback: "telegramCommand",
+	description: "Affiche la version de la base de donnée Xbox"
+     }
+    ]
+  },
+
+  telegramCommand: function(command, handler) {
+    if (command == "updatedb") {
+      handler.reply("TEXT", "La demande de mise à jour a été envoyé")
+      this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
+    }
+    if (command == "homestatus") this.cmd_homestatus(handler)
+    if (command == "versiondb") handler.reply("TEXT", "Base de donnée version : " + this.VersionDB)
+  },
+
+  cmd_homestatus: function(handler) {
+      var self = this
+      var data = self.HomeStatus
+      var text = ""
+      if (Object.keys(data).length > 0) {
+      	for (let [item, value] of Object.entries(data)) {
+		var activate = value.active
+		var display = value.display
+		var status = value.status
+		var color = value.color
+		var ping = value.ping
+		var rate = value.rate
+		var name = value.name
+		var app = value.app
+		var source = value.source
+		var new_title = false;
+
+		for (var i in display) {
+			if (activate) {
+				var end = false
+				//text += "*" + display[i]
+				if (status[i]) {
+					text += "*ON -- " + display[i]
+					/* how to display color !?
+					if (color && color[i]) {
+						text += ":* Color ? \n"
+						end = true
+					}
+					*/
+					if (ping && ping != null) {
+						text +=  ":* " + ping + " ms\n"
+						end = true
+					}
+					if (rate && rate !=0) {
+						text += ":* " + rate + " kbit/s\n"
+						end = true
+					}
+					if (name && name[i] && name[i] != null) {
+						text += ": * " + name[i] + "\n"
+						end = true
+					}
+					if (app && app[i] && app[i] != null) {
+						for ( var nb in self.XboxDB )
+							if(self.XboxDB[nb][0] == app[i]) {
+								text += ":* " + self.XboxDB[nb][1] + "\n"
+								new_title = true;
+								end = true
+							}
+						if(!new_title) {
+							text += ": * -!!!- Titre Inconnu\n"
+							end = true
+						}
+					}
+					if (source && source[i] && source[i] != null) {
+						text += ": * " + source[i] + "\n"
+						end = true
+					}
+					if (!end) text += "*\n"
+				} else text += "*OFF -- " + display[i] + "*\n"
+			}
+		}
+	}
+	handler.reply('TEXT', text, {parse_mode:'Markdown'})
+     }
+  },
 
 });
