@@ -1,20 +1,21 @@
-Xbox.Dashboard_8wekyb3d8bbwe!Xbox.Dashboard.Application,Acceuil
-GTA-V_vesz1v3mcwykm!GTAV,GTA V
-Sunrise_8wekyb3d8bbwe!ReleaseFinalDx12,Forza Horizon 4
-FishingSimWorld34CC32FA_qk15qyvsvhj3w!AppFishingSimWorld,Fishing Sim World
-ACDWW3981F5C7_b6krnev7r9sf8!scimitar.DX12.FX,Assassin's Creed Odyssey
-BurnoutParadiseRemastered_zwks512sysnyr!BurnoutParadise,Burnout Paradise Remastered
-FishingPlanetLLC.FishingPlanet_hyw3tn47ys49a!App,Fishing Planet
-Forza_8wekyb3d8bbwe!ReleaseFinal,Forza Motorsport 5
-Microsoft.HalifaxBaseGame_8wekyb3d8bbwe!HalifaxGameShip,Gears 5
-ACE-Europe_a43ghgr8ekz80!WarchestShip, Halo: La collection le Major
-NFS18_zwks512sysnyr!Race.App,Need for Speed Payback
-ACEUS1DEC71AF_b6krnev7r9sf8!scimitar.DX12.FX,Assassin's Creed Origins
-Microsoft.WindowsStore_8wekyb3d8bbwe!App,Microsoft Store
-CANALGroupe.CANALTOUCH_4d0jsvmsaqz2m!App,My Canal
-Deezer.62021768415AF_q7m17pa7q8kj0!App,Deezer
-CAF9E577.PlexforXbox_aam28m9va5cke!App,Plex
-GoogleInc.YouTube_yfg5n0ztvskxp!App,YouTube
-Microsoft.Xbox.LiveTV_8wekyb3d8bbwe!Microsoft.Xbox.LiveTV.Application,TV
-4DF9E0F8.Netflix_mcm4njqhnhss8!App,Netflix
-SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App,Spotify
+Version,20191115,1647
+Xbox.Dashboard_8wekyb3d8bbwe!Xbox.Dashboard.Application,Dashboard,app
+GTA-V_vesz1v3mcwykm!GTAV,GTA V,game
+Sunrise_8wekyb3d8bbwe!ReleaseFinalDx12,Forza Horizon 4,game
+FishingSimWorld34CC32FA_qk15qyvsvhj3w!AppFishingSimWorld,Fishing Sim World,game
+ACDWW3981F5C7_b6krnev7r9sf8!scimitar.DX12.FX,Assassin's Creed Odyssey,game
+BurnoutParadiseRemastered_zwks512sysnyr!BurnoutParadise,Burnout Paradise Remastered,game
+FishingPlanetLLC.FishingPlanet_hyw3tn47ys49a!App,Fishing Planet,game
+Forza_8wekyb3d8bbwe!ReleaseFinal,Forza Motorsport 5,game
+Microsoft.HalifaxBaseGame_8wekyb3d8bbwe!HalifaxGameShip,Gears 5,game
+ACE-Europe_a43ghgr8ekz80!WarchestShip, Halo: The Master Chief Collection,game
+NFS18_zwks512sysnyr!Race.App,Need for Speed Payback,game
+ACEUS1DEC71AF_b6krnev7r9sf8!scimitar.DX12.FX,Assassin's Creed Origins,game
+Microsoft.WindowsStore_8wekyb3d8bbwe!App,Microsoft Store,app
+CANALGroupe.CANALTOUCH_4d0jsvmsaqz2m!App,My Canal,app
+Deezer.62021768415AF_q7m17pa7q8kj0!App,Deezer,app
+CAF9E577.PlexforXbox_aam28m9va5cke!App,Plex,app
+GoogleInc.YouTube_yfg5n0ztvskxp!App,YouTube,app
+Microsoft.Xbox.LiveTV_8wekyb3d8bbwe!Microsoft.Xbox.LiveTV.Application,TV,app
+4DF9E0F8.Netflix_mcm4njqhnhss8!App,Netflix,app
+SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App,Spotify,app

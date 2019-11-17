@@ -78,6 +78,7 @@ Module.register("MMM-HomeStatus", {
 		this.Init = false;
 		this.HomeStatus = {};
 		this.XboxDB = {};
+		this.VersionDB = ""
 	},
 
 	notificationReceived: function (notification, payload) {
@@ -190,13 +191,13 @@ Module.register("MMM-HomeStatus", {
 						if (app && app[i] && app[i] != null) {
 							for ( var nb in self.XboxDB ) { // search title app in xbox db
 								if(self.XboxDB[nb][0] == app[i]) {
-									InfoCell.innerHTML = self.XboxDB[nb][1];
+									InfoCell.innerHTML = self.XboxDB[nb][1]
 									new_title = true;
 								}
 							}
 							if(!new_title) {
 								InfoCell.innerHTML = "-!!!- Titre Inconnu";
-								console.log("[HomeStatus] Xbox Title ? " + app[i])
+								self.sendSocketNotification("LOG", app[i]); // ? better place in console node_helper
 							}
 						}
 						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
@@ -272,7 +273,8 @@ Module.register("MMM-HomeStatus", {
             }
           }
           self.XboxDB = res;
-	  console.log("[HomeStatus] Title Loaded in Xbox Database : " + self.XboxDB.length)
+	  self.VersionDB = self.XboxDB[0][1] + "." + self.XboxDB[0][2]
+	  this.sendSocketNotification("UPDATED_OK", "[HomeStatus] Title Loaded in Xbox Database : " + (self.XboxDB.length-1) + " -- Version : " + self.VersionDB)
         }
       }
     }
@@ -318,7 +320,7 @@ Module.register("MMM-HomeStatus", {
   getCommands: function () {
     return [
       {
-        command: "updateDB",
+        command: "updatedb",
         callback: "telegramCommand",
         description: "Vous pouvez forcer la mise à jour de la base de donnée du module Xbox avec cette commande."
       },
@@ -327,17 +329,21 @@ Module.register("MMM-HomeStatus", {
 	callback: "telegramCommand",
 	description: "Affiche l'état des péripheriques IOT"
       },
+      {
+	command: "versiondb",
+	callback: "telegramCommand",
+	description: "Affiche la version de la base de donnée Xbox"
+     }
     ]
   },
 
   telegramCommand: function(command, handler) {
-    if (command == "updateDB") {
+    if (command == "updatedb") {
       handler.reply("TEXT", "La demande de mise à jour a été envoyé")
       this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
     }
-    if (command == "homestatus") {
-      this.cmd_homestatus(handler);
-    }
+    if (command == "homestatus") this.cmd_homestatus(handler)
+    if (command == "versiondb") handler.reply("TEXT", "Base de donnée version : " + this.VersionDB)
   },
 
   cmd_homestatus: function(handler) {
