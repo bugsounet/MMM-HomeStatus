@@ -92,24 +92,25 @@ Module.register("MMM-HomeStatus", {
 			// demande une nouvelle base de donnée depuis GitHub
 			this.sendSocketNotification("UpdateDB", false);
 		}
-		if (notification === "XBOX_ACTIVE") {
-			this.sendSocketNotification("UPDATE_XBSTATUS", true);
-			this.HomeStatus.Xbox.status[0] = true;
-			this.updateDom();
+		if (this.config.Xbox.rest) {
+			if (notification === "XBOX_ACTIVE") {
+				this.sendSocketNotification("UPDATE_XBSTATUS", true);
+				this.HomeStatus.Xbox.status[0] = true;
+				this.updateDom();
+			}
+			if (notification === "XBOX_INACTIVE") {
+				this.sendSocketNotification("UPDATE_XBSTATUS", false);
+				this.sendSocketNotification("UPDATE_XBNAME", "");
+				this.HomeStatus.Xbox.status[0] = false;
+				this.HomeStatus.Xbox.app[0] = ""
+				this.updateDom();
+                	}
+			if (notification === "XBOX_NAME") {
+				this.sendSocketNotification("UPDATE_XBNAME", payload);
+				this.HomeStatus.Xbox.app[0] = payload;
+				this.updateDom();
+                	}
 		}
-		if (notification === "XBOX_INACTIVE") {
-			this.sendSocketNotification("UPDATE_XBSTATUS", false);
-			this.sendSocketNotification("UPDATE_XBNAME", "");
-			this.HomeStatus.Xbox.status[0] = false;
-			this.HomeStatus.Xbox.app[0] = ""
-			this.updateDom();
-                }
-		if (notification === "XBOX_NAME") {
-			this.sendSocketNotification("UPDATE_XBNAME", payload);
-			this.HomeStatus.Xbox.app[0] = payload;
-			this.updateDom();
-                }
-
 	},
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === "RESULT") {
