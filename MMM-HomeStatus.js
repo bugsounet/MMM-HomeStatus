@@ -416,7 +416,10 @@ Module.register("MMM-HomeStatus", {
 								text += ": * -!!!- Titre Inconnu\n"
 								end = true
 							}
-						} else text += ":* " + app[i] + "\n"
+						} else {
+							text += ":* " + app[i] + "\n"
+							end = true
+						}
 					}
 					if (source && source[i] && source[i] != null) {
 						text += ": * " + source[i] + "\n"
