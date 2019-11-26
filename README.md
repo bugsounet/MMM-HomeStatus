@@ -18,6 +18,7 @@ It displays the status of the modules and information if they are available
 * TV: this module works only with Philips TV
 * Freebox: This module works with Freebox Revolution (V6), Freebox Crystal. Freebox Mini, one and Delta have not been tested (need tester)
 * Xbox: need a database to translate the name of the application / games from the xbox to the real name (xbox.db)
+	Or it's possible to link MMM-HomeStatus to MMM-Xbox to display Xbox state
 
 
 ## Installation
@@ -105,6 +106,7 @@ To display the module insert it in the config.js file.
 		},
 		Xbox: { // Xbox One Module
 			active: true, // activation
+			rest: false // link to MMM-Xbox
 			ip: [
 				"192.168.0.39" // ip1
 			],
@@ -129,6 +131,7 @@ ips are: 192.168.0.20 (Xbox 1) and 192.168.0.21 (Xbox 2)
 ```
 		Xbox: {
 			active: true, // activation du module
+			rest: false // need to be false
 			ip: [
 				"192.168.0.20", // ip1
                                 "192.168.0.21" // ip2
@@ -186,15 +189,15 @@ example of complete configuration with 2 MagicHome devices, 2 PC, and internet s
 
 If an app / game displays on screen: -!!!- Titre Inconnu
 
-Set the debug mode to true in the configuration
-
 Send me the Xbox notification
 
 I will add it to the Xbox database
+
 ```
-[HomeStatus] XBOX Module: 192.168.0.39 -> Xbox One X: true (SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App)
+[HomeStatus] Xbox Database: Please ask update of the title SpotifyAB.SpotifyMusic-forXbox_zpdnekdrzrea0!App
 ```
 -> Spotify 
 
 ## Change Log
+* 2019/11/26 Debug and add MMM-Xbox Rest Server
 * 2019/11/11 Initial Public Release
