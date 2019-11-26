@@ -41,7 +41,7 @@ async function Freebox_Rate(token,id,domain,port) {
 module.exports = NodeHelper.create({
 
     start: function() {
-        console.log('Démarrage du node_helper pour le module ' + this.name + '...');
+        console.log('Starting' + this.name + '...');
 	this.Magic_data = []
 	this.FB_status = []
 	this.TV_status = []
@@ -112,7 +112,10 @@ module.exports = NodeHelper.create({
 		self.Magic_data[nb] = state;
 	}, function (error) {
 		console.log("[HomeStatus] MagicHome -- " + error);
-		self.Magic_data[nb] = "Erreur !"
+		self.Magic_data[nb] = {
+			on: false,
+			color: { red: 0, green: 0, blue: 0 }
+		}
 	});
     },
 
@@ -227,9 +230,11 @@ module.exports = NodeHelper.create({
 
     FBserver_Rate: function (token,id,domain,port) {
 	var self = this;
-	Freebox_Rate(token,id,domain,port).then(function(res) {
+	Freebox_Rate(token,id,domain,port).then( function(res) { 
 		self.FBS_rate = res;
-	});
+	}, function(err) { 
+		console.log("[HomeStatus] Freebox Server Rate -- " + err) 
+	} );
     },
 
     FBCrystal : function () {
@@ -256,10 +261,10 @@ module.exports = NodeHelper.create({
 	var self = this;
     	var dir = path.resolve(__dirname, "")
     	var cmd = "cd " + dir + "; cp xbox.db xbox.db.sav ; rm xbox.db ; git checkout xbox.db"
-    	//exec(cmd, (e,so,se)=>{
+    	exec(cmd, (e,so,se)=>{
       		console.log("[HomeStatus] Fresh Update of the xbox database")
 		self.sendSocketNotification("UPDATED", payload)
-    	//})
+    	})
     },
 
     HomeScan: function() {
@@ -291,7 +296,7 @@ module.exports = NodeHelper.create({
 	}
 	if (self.config.Freebox_Crystal.active) this.FBCrystal();
 
-	if (self.config.Xbox.active) for(var i in self.config.Xbox.ip) this.xbox_Status(self.config.Xbox.ip[i],i);
+	if (self.config.Xbox.active && !self.config.Xbox.rest) for(var i in self.config.Xbox.ip) this.xbox_Status(self.config.Xbox.ip[i],i);
 	if (self.config.Internet.active) this.internet_Status();
     },
 
@@ -300,7 +305,7 @@ module.exports = NodeHelper.create({
 	    var self = this;
 	    if (payload) {
 		this.config = payload;
-		this.updateDB(true);
+		if (this.config.Xbox.active && !self.config.Xbox.rest) this.updateDB(true);
 	    }
 
 	    if (this.config.debug) console.log("[HomeStatus] Collecting devices informations ...");
@@ -321,9 +326,10 @@ module.exports = NodeHelper.create({
 			if (this.config.PC.active) {
 					for(var i in self.config.PC.ip) console.log("[HomeStatus] Module PC: " + this.config.PC.ip[i] + " -> " + self.PC_name[i] + " : " + self.PC_status[i]);
 			}
-			if (this.config.Xbox.active) {
+			if (this.config.Xbox.active && !this.config.Xbox.rest) {
 					for(var i in self.config.Xbox.ip) console.log("[HomeStatus] Module XBOX: " + this.config.Xbox.ip[i] + " -> " + this.config.Xbox.display[i] + " : " + self.XBOX_status[i] + " (" + self.XBOX_app[i] + ")");
 			}
+			if (this.config.Xbox.rest) console.log("[HomeStatus] Module XBOX: Live by Rest Server")
 
 			console.log("[HomeStatus] All informations collected !");
 
@@ -370,8 +376,10 @@ module.exports = NodeHelper.create({
 		if (this.config.Xbox.active) {
 			this.HomeStatus.Xbox.active = true;
 			this.HomeStatus.Xbox.display = this.config.Xbox.display;
-			this.HomeStatus.Xbox.status = self.XBOX_status;
-			this.HomeStatus.Xbox.app = self.XBOX_app;
+			if (!this.config.Xbox.rest) {
+				this.HomeStatus.Xbox.status = self.XBOX_status;
+				this.HomeStatus.Xbox.app = self.XBOX_app;
+			}
 		}
 		if (this.config.Internet.active) {
 			this.HomeStatus.Internet.active = true;
@@ -383,11 +391,13 @@ module.exports = NodeHelper.create({
 		self.sendSocketNotification("RESULT", this.HomeStatus);
             } , 4000);
         }
-	if (notification === 'UpdateDB') {
-		this.updateDB(payload);
-	}
-	if (notification === 'LOG') console.log("[HomeStatus] Xbox Database: Please ask update of the title " + payload) 
-	if (notification === 'UPDATED_OK') console.log(payload) 
+	if (notification === 'UpdateDB') this.updateDB(payload);
+	if (notification === 'LOG') console.log("[HomeStatus] Xbox Database: Please ask update of the title " + payload)
+	if (notification === 'UPDATED_OK') console.log(payload)
+
+	// update via Rest Server (MMM-Xbox)
+	if (notification === 'UPDATE_XBSTATUS') this.HomeStatus.Xbox.status[0] = payload
+	if (notification === 'UPDATE_XBNAME') this.HomeStatus.Xbox.app[0] = payload
     },
 
 });

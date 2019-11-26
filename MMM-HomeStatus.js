@@ -36,6 +36,7 @@ Module.register("MMM-HomeStatus", {
 		},
 		Xbox: {
 			active: false,
+			rest: false,
 			display: [],
 			ip: []
 		},
@@ -91,6 +92,24 @@ Module.register("MMM-HomeStatus", {
 			// demande une nouvelle base de donnée depuis GitHub
 			this.sendSocketNotification("UpdateDB", false);
 		}
+		if (notification === "XBOX_ACTIVE") {
+			this.sendSocketNotification("UPDATE_XBSTATUS", true);
+			this.HomeStatus.Xbox.status[0] = true;
+			this.updateDom();
+		}
+		if (notification === "XBOX_INACTIVE") {
+			this.sendSocketNotification("UPDATE_XBSTATUS", false);
+			this.sendSocketNotification("UPDATE_XBNAME", "");
+			this.HomeStatus.Xbox.status[0] = false;
+			this.HomeStatus.Xbox.app[0] = ""
+			this.updateDom();
+                }
+		if (notification === "XBOX_NAME") {
+			this.sendSocketNotification("UPDATE_XBNAME", payload);
+			this.HomeStatus.Xbox.app[0] = payload;
+			this.updateDom();
+                }
+
 	},
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === "RESULT") {
@@ -189,16 +208,18 @@ Module.register("MMM-HomeStatus", {
 						if (rate && rate !=0) InfoCell.innerHTML = rate + " kbit/s"// rate Freebox
 						if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i] // name PC
 						if (app && app[i] && app[i] != null) {
-							for ( var nb in self.XboxDB ) { // search title app in xbox db
-								if(self.XboxDB[nb][0] == app[i]) {
-									InfoCell.innerHTML = this.translate(self.XboxDB[nb][1])
-									new_title = true;
+							if (!self.config.Xbox.rest) {
+								for ( var nb in self.XboxDB ) { // search title app in xbox db
+									if(self.XboxDB[nb][0] == app[i]) {
+										InfoCell.innerHTML = this.translate(self.XboxDB[nb][1])
+										new_title = true;
+									}
 								}
-							}
-							if(!new_title) {
-								InfoCell.innerHTML = "-!!!- Titre Inconnu";
-								self.sendSocketNotification("LOG", app[i]); // ? better place in console node_helper
-							}
+								if(!new_title) {
+									InfoCell.innerHTML = "-!!!- Titre Inconnu";
+									self.sendSocketNotification("LOG", app[i]); // ? better place in console node_helper
+								}
+							} else InfoCell.innerHTML = app[i]
 						}
 						if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i] // source TV
 					}
@@ -335,21 +356,18 @@ Module.register("MMM-HomeStatus", {
 	callback: "telegramCommand",
 	description: "Affiche l'état des péripheriques IOT"
       },
-      {
-	command: "versiondb",
-	callback: "telegramCommand",
-	description: "Affiche la version de la base de donnée Xbox"
-     }
     ]
   },
 
   telegramCommand: function(command, handler) {
     if (command == "updatedb") {
-      handler.reply("TEXT", "La demande de mise à jour a été envoyé")
-      this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
+	if (this.config.Xbox.active && !this.config.Xbox.rest) {
+      		handler.reply("TEXT", "La demande de mise à jour a été envoyé")
+      		this.notificationReceived("XBOXDB_UPDATE", handler.args, "MMM-TelegramBot")
+	}
+	else handler.reply("TEXT", "Le module Xbox database est désactivé")
     }
     if (command == "homestatus") this.cmd_homestatus(handler)
-    if (command == "versiondb") handler.reply("TEXT", "Base de donnée version : " + this.VersionDB)
   },
 
   cmd_homestatus: function(handler) {
@@ -372,15 +390,8 @@ Module.register("MMM-HomeStatus", {
 		for (var i in display) {
 			if (activate) {
 				var end = false
-				//text += "*" + display[i]
 				if (status[i]) {
 					text += "*ON -- " + display[i]
-					/* how to display color !?
-					if (color && color[i]) {
-						text += ":* Color ? \n"
-						end = true
-					}
-					*/
 					if (ping && ping != null) {
 						text +=  ":* " + ping + " ms\n"
 						end = true
@@ -394,16 +405,18 @@ Module.register("MMM-HomeStatus", {
 						end = true
 					}
 					if (app && app[i] && app[i] != null) {
-						for ( var nb in self.XboxDB )
-							if(self.XboxDB[nb][0] == app[i]) {
-								text += ":* " + self.XboxDB[nb][1] + "\n"
-								new_title = true;
+						if (!self.config.Xbox.rest) {
+							for ( var nb in self.XboxDB )
+								if(self.XboxDB[nb][0] == app[i]) {
+									text += ":* " + self.XboxDB[nb][1] + "\n"
+									new_title = true;
+									end = true
+								}
+							if(!new_title) {
+								text += ": * -!!!- Titre Inconnu\n"
 								end = true
 							}
-						if(!new_title) {
-							text += ": * -!!!- Titre Inconnu\n"
-							end = true
-						}
+						} else text += ":* " + app[i] + "\n"
 					}
 					if (source && source[i] && source[i] != null) {
 						text += ": * " + source[i] + "\n"
