@@ -193,7 +193,6 @@ Module.register("MMM-HomeStatus", {
 	},
 
         displayDom: function(value) {
-	console.log(value)
           var activate = value.active
           var display = value.display
           var status = value.status
