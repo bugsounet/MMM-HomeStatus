@@ -38,13 +38,13 @@ module.exports = NodeHelper.create({
 
     start: function() {
       console.log('Starting ' + this.name + '...');
-
+      this.ticks = 0
       this.HomeStatus = {
         "Light": {
-        "active": false,
-        "display": [],
-        "status": [],
-        "color": []
+          "active": false,
+          "display": [],
+          "status": [],
+          "color": []
         },
         "Freebox_Player": {
           "active": false,
@@ -110,11 +110,31 @@ module.exports = NodeHelper.create({
           } else {
             self.HomeStatus.Internet.status[0] = false
             self.HomeStatus.Internet.ping = null
+            self.ticks +=1
           }
           self.sendInfo("INTERNET", self.HomeStatus.Internet)
+          self.needRestart()
         });
     },
 
+    needRestart: function() {
+      if (this.ticks > 0 && this.HomeStatus.Internet.status[0]) {
+        console.log("[HomeStatus] ALERT Internet is AVAILABLE -- After " + this.ticks + " retry")
+        this.ticks = 0
+        console.log("[HomeStatus] Need: pm2 restart in 5 secs")
+        this.sendSocketNotification("ALERT_UP");
+        setTimeout (() => { 
+          exec ("pm2 restart 0", (e,stdo,stde,) => {
+              if (e) console.log (e)
+          })
+        } , 5000 )
+        // insert your "crazy" code there !!!
+      } else if (!this.HomeStatus.Internet.status[0]) {
+        console.log("[HomeStatus] ALERT Internet is DOWN -- Retry: " + this.ticks)
+        this.sendSocketNotification("ALERT_DOWN", this.ticks);
+      }
+   },
+    
 /* TV check */
     tv_Status: function (ip,nb) {
       var self = this
@@ -265,11 +285,11 @@ module.exports = NodeHelper.create({
         this.HomeStatus.PC.display = this.config.PC.display
       }
       if (this.config.Freebox_V6.active) {
-	this.HomeStatus.Freebox_Player.active = true
-	this.HomeStatus.Freebox_Server.active = true
+        this.HomeStatus.Freebox_Player.active = true
+        this.HomeStatus.Freebox_Server.active = true
       }
       if (this.config.Xbox.active) {
-	this.HomeStatus.Xbox.active = true
+        this.HomeStatus.Xbox.active = true
         this.HomeStatus.Xbox.display = this.config.Xbox.display
       }
       if (this.config.Internet.active) {

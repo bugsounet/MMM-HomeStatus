@@ -1,6 +1,6 @@
 Module.register("MMM-HomeStatus", {
 
-	defaults: {
+        defaults: {
           delay: 10 * 1000,
           debug: false,
           MagicHome: {
@@ -42,7 +42,7 @@ Module.register("MMM-HomeStatus", {
             scan: "google.fr",
             display: [ "Internet" ]
           }
-	},
+        },
 
         configAssignment : function (result) {
           var stack = Array.prototype.slice.call(arguments, 1)
@@ -61,7 +61,7 @@ Module.register("MMM-HomeStatus", {
       	    }
           }
           return result
-  	},
+        },
 
         start: function () {
           this.config = this.configAssignment({}, this.defaults, this.config)
@@ -111,7 +111,7 @@ Module.register("MMM-HomeStatus", {
               "ping": null
             }
           }
-	},
+        },
 
         notificationReceived: function (notification, payload) {
           switch(notification) {
@@ -125,36 +125,32 @@ Module.register("MMM-HomeStatus", {
               break
             case "XBOX_ACTIVE":
               if (this.config.Xbox.rest) {
-                this.sendSocketNotification("UPDATE_XBSTATUS", true)
                 this.HomeStatus.Xbox.status[0] = true
-		this.displayDom(this.HomeStatus.Xbox)
+                this.displayDom(this.HomeStatus.Xbox)
               }
               break
             case "XBOX_INACTIVE":
               if (this.config.Xbox.rest) {
-                this.sendSocketNotification("UPDATE_XBSTATUS", false)
-                this.sendSocketNotification("UPDATE_XBNAME", "")
                 this.HomeStatus.Xbox.status[0] = false
                 this.HomeStatus.Xbox.app[0] = ""
-		this.displayDom(this.HomeStatus.Xbox)
+                this.displayDom(this.HomeStatus.Xbox)
               }
               break
             case "XBOX_NAME":
               if (this.config.Xbox.rest) {
-                this.sendSocketNotification("UPDATE_XBNAME", payload)
                 this.HomeStatus.Xbox.app[0] = payload
-		this.displayDom(this.HomeStatus.Xbox)
+                this.displayDom(this.HomeStatus.Xbox)
               }
               break
           }
-	},
+        },
 
         socketNotificationReceived: function (notification, payload) {
           switch (notification) {
             case "INITIALIZED":
               this.Init = true
               this.HomeStatus = payload
-		this.updateDom()
+              this.updateDom()
               this.IntervalScanDevice()
               break
             case "UPDATED":
@@ -189,11 +185,15 @@ Module.register("MMM-HomeStatus", {
               this.HomeStatus.Xbox = payload
               this.displayDom(payload)
               break
+            case "ALERT_DOWN":
+              this.sendNotification("SHOW_ALERT", { type: "alert" , message: "Internet Down ! Retry: " + payload, title: "HomeStatus" })
+              break
+            case "ALERT_UP":
+              this.sendNotification("SHOW_ALERT", { type: "alert" , message: "Internet is now available! Restarting Magic Mirror...", title: "HomeStatus" })
           }
-	},
+        },
 
         displayDom: function(value) {
-          var activate = value.active
           var display = value.display
           var status = value.status
           var color = value.color
@@ -212,13 +212,9 @@ Module.register("MMM-HomeStatus", {
                 InfoCell.style.backgroundColor = rgb
                 InfoCell.style.borderRadius = "25px"
               }
-
               if (ping && ping != null) InfoCell.innerHTML = ping + " ms"
-
               if (rate && rate !=0) InfoCell.innerHTML = rate + " kbit/s"
-
               if (name && name[i] && name[i] != null) InfoCell.innerHTML = name[i]
-
               if (app && app[i] && app[i] != null) {
                 if (!this.config.Xbox.rest) {
                   for (var nb in this.XboxDB) {
@@ -233,11 +229,10 @@ Module.register("MMM-HomeStatus", {
                   }
                 } else InfoCell.innerHTML = app[i]
               }
-
               if (source && source[i] && source[i] != null) InfoCell.innerHTML = source[i]
             } else {
               InfoCell.innerHTML = ""
-	      if (color && color[i]) InfoCell.style.backgroundColor = "rgb(0,0,0)"
+              if (color && color[i]) InfoCell.style.backgroundColor = "rgb(0,0,0)"
             }
             // button Cell
             var button = document.querySelector("#switched." + display[i].replace(/ /g,"_"))
