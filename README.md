@@ -1,5 +1,7 @@
 # MMM-HomeStatus
 
+** Archived **
+
 MMM-HomeStatus is a module for the [MagicMirror](https://github.com/MichMich/MagicMirror) project by [Michael Teeuw](https://github.com/MichMich).
 
 It displays the status of the modules and information if they are available
